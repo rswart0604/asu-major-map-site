@@ -1,0 +1,52 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+#site_header {
+    color: maroon;
+    font-size: 4vmax;
+    font-family: Helvetica,serif;
+    font-weight: bold;
+    background-color: gold;
+    border-style: none;
+    margin-bottom: 2vh;
+    padding-top: 40px;
+}
+
+
+#top_menu {
+    display: block;
+    text-align: center;
+}
+
+#major_name_box {
+    width: 80%;
+    height: 45px;
+    text-after-overflow: ellipsis;
+}
+
+#major_name_box::placeholder {
+    font-size: 15px;
+}
+
+#major_name_box_submit {
+    height: 45px
+}
+
+html, body {
+    min-height: 100vh;
+}
+
+
+/*this is for desktop-specific settings*/
+@media only screen and (min-width: 600px) {
+
+    #site_header {font-size: 3vmax; padding-top: 0px}
+    #top_menu {text-align: left; margin-left: 1vw}
+    #major_name_box {width: 40%; height: 20px}
+    #major_name_box_submit {height: 25px}
+    #svg_container {width: 70vw; margin-left: 1vw; margin-top: 2vh}
+    #major_map_svg {width: 70vw; height: 50vw; top: 0}
+/*    position: relative; top: 0; left: 0*/
+}
