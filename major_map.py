@@ -3,6 +3,8 @@ import copy
 from bs4 import BeautifulSoup
 from urllib.request import urlopen, ProxyHandler
 from proxy_finder import get_proxy
+import aiohttp
+import asyncio
 from pprint import pprint
 
 
@@ -361,6 +363,69 @@ class MajorMap:
         self.prereqs[course_name] = out
         print(course_name + ":   " + str(self.prereqs[course_name]))
         return out
+
+    async def get_async_prereq(self, course_name):
+        async with aiohttp.ClientSession() as client:
+            # print('course name?' + str(course_name))
+            try:
+                r = self.prereqs[course_name]
+                print('nailed it')
+                return r
+            except KeyError as e:
+                pass
+
+            url = self.course_to_url[course_name]
+            if url is None or url[0] == '#' or len(url) < 34:
+                return []
+
+            # get some more soup!
+            new_url = url.replace('courselist', 'mycourselistresults')
+            # print(new_url)
+            # print('hi!')
+            for x in range(3):
+                try:
+                    # print('got to the await?')
+                    foo = await client.request('get', new_url)
+                    # print('and made it to the other side')
+                    break
+                except Exception:
+                    pass
+            if foo is None:
+                raise Exception
+
+            soup = BeautifulSoup(await foo.text(), features='html.parser')
+            tables = soup.find_all('td', class_='courseTitleLongColumnValue')
+            # print(tables)
+
+            if len(tables) > 1:
+                return []
+            else:
+                text = tables[0].text
+
+            out = []
+            abbreviations = flatten(self.get_course_abbreviations().values())
+            for abb in abbreviations:
+                if abb in text:
+                    out.append(self.abbreviation_to_course_name[abb])
+                elif abb[0:3] in text and abb[4:7] in text:  # going a lil complicated but cmon just work already
+                    out.append(self.abbreviation_to_course_name[abb])
+            self.prereqs[course_name] = out
+            print(course_name + ":   " + str(self.prereqs[course_name]))
+            return out
+
+    async def async_find_all_prereqs(self):
+        courses = flatten(self.get_terms_list())
+        for i in range(len(courses)):
+            courses[i] = self.get_async_prereq(courses[i])
+        # print(courses)
+        all_prereqs = await asyncio.gather(*courses)
+        # print(all_prereqs)
+
+    def find_all_prereqs(self):
+        # loop = asyncio.new_event_loop()
+        # asyncio.set_event_loop(loop)
+        asyncio.run(self.async_find_all_prereqs())
+        print(self.prereqs)
 
     def unabbreviate_courses(self, courses):
         self.get_course_abbreviations()

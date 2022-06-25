@@ -36,12 +36,14 @@ def get_info():
             if current_map is None:
                 print(request.headers['data'])
                 try:
+                    print('this is the only one')
                     current_map = mm.MajorMap(request.headers['data'], loop)
                 except ValueError:
                     return 'must be valid url!'  # todo make this like a template or something idk
                 current_chart = mc.Chart(current_map)
             else:
-                current_map = current_map + mm.MajorMap(request.headers['data'], loop)
+                print('adding one')
+                current_chart.add_map(mm.MajorMap(request.headers['data'], loop))
             svg = current_chart.get_graph()
             svg = svg[:5] + 'id="major_map_svg" ' + svg[5:]
             return svg

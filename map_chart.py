@@ -49,10 +49,19 @@ class Chart:
         self.removed_courses = []
         self.wires_colors = {}
 
+    def add_map(self, some_map):
+        self.maj_map = self.maj_map + some_map
+        self.map = self.maj_map.get_terms_list(False, True, return_copy=False)
+
     def get_graph(self):
         with schemdraw.Drawing(show=False, fontsize=12) as d:
 
             if self.maj_map is not None:
+
+                self.maj_map.find_all_prereqs()
+                prereq_courses = self.maj_map.prereqs.keys()
+
+
                 print('MAJ MAP!!!')
 
                 flat_list = major_map.flatten(self.maj_map.get_terms_list())
@@ -81,7 +90,7 @@ class Chart:
                         course_to_box[course] = flow.Box(w=self.BOX_WIDTH, h=self.BOX_HEIGHT).label(result).at(
                             (x_pos, y_pos))
                         d += course_to_box[course]
-                        prereqs = self.maj_map.find_prereqs(course)
+                        prereqs = self.maj_map.prereqs[course] if course in prereq_courses else []
                         if len(prereqs) > 0 and x_pos > 0:
                             # print(course + ": " + str(prereqs))
                             for prereq in set(prereqs):
