@@ -50,9 +50,7 @@ class Chart:
         self.wires_colors = {}
 
     def get_graph(self):
-        file_name = str(self.maj_map).lower().replace(' ', '_') \
-                    + '.svg' if self.maj_map is not None else 'major_map.svg'
-        with schemdraw.Drawing(file=file_name, fontsize=12) as d:
+        with schemdraw.Drawing(show=False, fontsize=12) as d:
 
             if self.maj_map is not None:
                 print('MAJ MAP!!!')
@@ -153,6 +151,7 @@ class Chart:
 
                         d += flow.Box(w=self.BOX_WIDTH, h=self.BOX_HEIGHT).label(result).at((x_pos, y_pos))
                     x_pos += (self.BOX_WIDTH + self.dx)
+        return str(d.get_imagedata('svg'))
 
 
 

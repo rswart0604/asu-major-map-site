@@ -38,25 +38,29 @@ class MajorMap:
     CS = 'https://degrees.apps.asu.edu/major-map/ASU00/ESCSEBS/null/ALL/2021?init=false&nopassive=true'
     CSE = 'https://degrees.apps.asu.edu/major-map/ASU00/ESCSEBSE/null/ALL/2022'
 
-    def __init__(self, major_map_url: str):
+    def __init__(self, major_map_url: str, loop=None):
         """Create your favorite major map
 
         :param major_map_url: the url of the major map
         """
 
         # get our soup
-        proxy = {'http': get_proxy()}
+        if loop is not None:
+            proxy = {'http': get_proxy(loop)}
+        else:
+            proxy = {'http': get_proxy()}
         ProxyHandler(proxy)
         print(proxy)
         print('before')
-        for x in range(3):
-            try:
-                foo = urlopen(major_map_url, timeout=5)
-                break
-            except Exception:
-                proxy = {'http': get_proxy()}
-                ProxyHandler(proxy)
-                pass
+        foo = urlopen(major_map_url, timeout=5)
+        # for x in range(3):
+        #     try:
+        #
+        #         break
+        #     except Exception:
+        #         proxy = {'http': get_proxy()}
+        #         ProxyHandler(proxy)
+        #         pass
         if foo is None:
             raise Exception
         print('after')
