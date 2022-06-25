@@ -52,15 +52,18 @@ class MajorMap:
         ProxyHandler(proxy)
         print(proxy)
         print('before')
-        foo = urlopen(major_map_url, timeout=5)
-        # for x in range(3):
-        #     try:
-        #
-        #         break
-        #     except Exception:
-        #         proxy = {'http': get_proxy()}
-        #         ProxyHandler(proxy)
-        #         pass
+
+        for x in range(3):
+            try:
+                foo = urlopen(major_map_url, timeout=5)
+                break
+            except Exception:
+                if loop is not None:
+                    proxy = {'http': get_proxy(loop)}
+                else:
+                    proxy = {'http': get_proxy()}
+                ProxyHandler(proxy)
+                pass
         if foo is None:
             raise Exception
         print('after')

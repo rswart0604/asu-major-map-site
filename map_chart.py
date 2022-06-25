@@ -151,7 +151,7 @@ class Chart:
 
                         d += flow.Box(w=self.BOX_WIDTH, h=self.BOX_HEIGHT).label(result).at((x_pos, y_pos))
                     x_pos += (self.BOX_WIDTH + self.dx)
-        return str(d.get_imagedata('svg'))
+        return str(d.get_imagedata('svg'))[2:]
 
 
 

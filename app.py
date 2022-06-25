@@ -41,21 +41,16 @@ def get_info():
                     return 'must be valid url!'  # todo make this like a template or something idk
                 current_chart = mc.Chart(current_map)
             else:
-                current_map = current_map + mm.MajorMap(request.headers['data'])
-            return current_chart.get_graph()
-        # except RuntimeError as e:
-        #     print(e)
-        #     print('err')
-        #     return ''
-    else:
-        return ''
+                current_map = current_map + mm.MajorMap(request.headers['data'], loop)
+            svg = current_chart.get_graph()
+            svg = svg[:5] + 'id="major_map_svg" ' + svg[5:]
+            return svg
+    return ''
 
     # a = random.random()
     # resp = make_response(render_template('test.html'))
     # resp.set_cookie('your cookie', value=str(a))
     # return resp
-
-    return
 
 
     #
