@@ -70,9 +70,12 @@ class Chart:
 
                 y_channels = [0] * (len(self.map) - 1)
                 max_courses = major_map.get_longest_from_nested(self.maj_map.get_terms_list(labels=True))
-                if max_courses > 5:
-                    self.dy = 2.4
-                    self.dx = 2.6
+                if max_courses > 10:
+                    self.dy = 3.4
+                    self.dx = 4.2
+                elif max_courses > 5:
+                    self.dy = 2.6
+                    self.dx = 2.8
                 x_channels = [0] * max_courses
 
                 course_to_box = {}

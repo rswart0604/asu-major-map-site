@@ -46,7 +46,8 @@ html, body {
     #top_menu {text-align: left; margin-left: 1vw}
     #major_name_box {width: 40%; height: 20px}
     #major_name_box_submit {height: 25px}
-    #svg_container {width: 70vw; margin-left: 1vw; margin-top: 2vh}
-    #major_map_svg {width: 70vw; height: 50vw; top: 0}
+    #svg_container {width: 70vw; margin-left: 1vw; margin-top: 2vh;}
+    #major_map_svg {width: 70vw; height: 50vw; top: 0; border-color: maroon; border-style: solid}
+    #reset_button {height: 25px}
 /*    position: relative; top: 0; left: 0*/
 }

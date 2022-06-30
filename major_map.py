@@ -48,18 +48,24 @@ class MajorMap:
 
         # get our soup
         if loop is not None:
-            proxy = {'http': get_proxy(loop)}
+            try:
+                proxy = {'http': get_proxy(loop)}
+                ProxyHandler(proxy)
+            except RuntimeError:
+                pass
         else:
             proxy = {'http': get_proxy()}
-        ProxyHandler(proxy)
-        print(proxy)
+            ProxyHandler(proxy)
+
+        # print(proxy)
         print('before')
 
         for x in range(3):
             try:
                 foo = urlopen(major_map_url, timeout=5)
                 break
-            except Exception:
+            except Exception as err:
+                print('uh oh ' + str(err))
                 if loop is not None:
                     proxy = {'http': get_proxy(loop)}
                 else:
@@ -67,7 +73,7 @@ class MajorMap:
                 ProxyHandler(proxy)
                 pass
         if foo is None:
-            raise Exception
+            raise ValueError()
         print('after')
         a = foo.read().decode('utf8')
         soup = BeautifulSoup(a, features='html.parser')
@@ -400,7 +406,11 @@ class MajorMap:
             if len(tables) > 1:
                 return []
             else:
-                text = tables[0].text
+                print('tables' + str(tables))
+                try:
+                    text = tables[0].text
+                except Exception:
+                    return []
 
             out = []
             abbreviations = flatten(self.get_course_abbreviations().values())

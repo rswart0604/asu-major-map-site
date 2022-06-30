@@ -18,6 +18,7 @@
 
     <script src="../static/svg_stuff.js"></script>
     <script>
+        var svg_data = "";
 
         function waitForElementToDisplay(selector, callback, checkFrequencyInMs, timeoutInMs) {
           var startTimeInMs = Date.now();
@@ -41,7 +42,14 @@
             const xhttp = new XMLHttpRequest();
             document.getElementById('svg_container').innerHTML = '';
             xhttp.onload = function () {
-                document.getElementById('svg_container').innerHTML = this.responseText;
+                if (this.responseText === "reset svg") {
+                    resetSvgStuff();
+                } else {
+                    document.getElementById('svg_container').innerHTML = this.responseText;
+                    if (this.responseText.substring(0, 4) === "<svg") {
+                        svg_data = this.responseText;
+                    }
+                }
             };
             xhttp.open("POST", "/test");
             xhttp.setRequestHeader('data', formData);
@@ -50,23 +58,28 @@
                 console.log(document.getElementById('major_map_svg'));
                 foo();
             }, 200, 1000000);
-            {#foo();#}
         }
 
-        {#waitForElementToDisplay("#div1",function(){alert("Hi");},1000,9000);#}
+        function resetSvgStuff() {
+            document.getElementById('svg_container').innerHTML = svg_data;
+            foo();
+        }
 
-
-
-
-
+        function deleteCookies() {
+            console.log('delete!');
+        }
     </script>
 
-    <form id='major_name_form' method="post">
-        <label for="major_name_box"></label>
-        <input type="text" id="major_name_box" name="major_name_box"
-               placeholder="Link to (or precise name of) major map" required>
-        <input type="reset" id="major_name_box_submit" onclick="major_name();" value="Add">
-    </form>
+    <div id="top_buttons">
+        <form id='major_name_form' method="post">
+            <label for="major_name_box"></label>
+            <input type="text" id="major_name_box" name="major_name_box"
+                   placeholder="Link to (or precise name of) major map" required>
+            <input type="reset" id="major_name_box_submit" onclick="major_name();" value="Add">
+        </form>
+    </div>
+
+    <button id="reset_button" type="button" onclick="resetSvgStuff()">Reset</button>
 </div>
 
 <div id="svg_container">
