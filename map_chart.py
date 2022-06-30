@@ -17,7 +17,7 @@ def format_words(course: str):
     tmp = ""
     for word in words:
         tmp += (word + " ")
-        if len(tmp) > 12:
+        if len(tmp) > 10:
             word_list.append((tmp + '\n'))
 
             tmp = str('')
@@ -57,6 +57,9 @@ class Chart:
     def get_map(self):
         return self.maj_map
 
+    def move_course(self, course, source, dest):
+        self.maj_map.move_course(course, source, dest, abbreviation=False)
+
     def get_graph(self):
         with schemdraw.Drawing(show=False, fontsize=12) as d:
 
@@ -86,15 +89,23 @@ class Chart:
                 x_pos = 0
 
                 for term, courses in self.map.items():
-                    d += flow.Box(w=self.BOX_WIDTH, h=self.BOX_HEIGHT).label(term).at((x_pos, 0))  # our term label
+                    d += flow.Box(w=self.BOX_WIDTH, h=self.BOX_HEIGHT).label(term, fontsize=20).at((x_pos, 0))  # our term label
                     y_pos = 0
                     for course in courses:  # go through each term's courses pls
                         y_pos -= (self.BOX_HEIGHT + self.dy)
 
                         # stupid stupid string formatting stuff. no more than 20 chars per line allowed
                         result = format_words(course)
+                        if len(result) < 30:
+                            size = 17
+                        elif len(result) < 48:
+                            size = 16
+                        elif len(result) < 100:
+                            size = 14
+                        else:
+                            size = 12
 
-                        course_to_box[course] = flow.Box(w=self.BOX_WIDTH, h=self.BOX_HEIGHT).label(result).at(
+                        course_to_box[course] = flow.Box(w=self.BOX_WIDTH, h=self.BOX_HEIGHT).label(result, fontsize=size).at(
                             (x_pos, y_pos))
                         d += course_to_box[course]
                         prereqs = self.maj_map.prereqs[course] if course in prereq_courses else []
@@ -173,11 +184,8 @@ class Chart:
 
 
 colors = [
-    ["aqua marine", "#7FFFD4"],
-    ["bisque", "#FFE4C4"],
     ["Black", "#000000"],
     ["black", "#000000"],
-    ["Blue", "#0000FF"],
     ["blue", "#0000FF"],
     ["blue violet", "#8A2BE2"],
     ["brown", "#A52A2A"],
@@ -214,7 +222,6 @@ colors = [
     ["gold", "#FFD700"],
     ["golden rod", "#DAA520"],
     ["Gray", "#808080"],
-    ["gray-grey", "#808080"],
     ["Green", "#008000"],
     ["green", "#008000"],
     ["green yellow", "#ADFF2F"],
@@ -230,10 +237,8 @@ colors = [
     ["light sky blue", "#87CEFA"],
     ["light slate gray", "#778899"],
     ["light steel blue", "#B0C4DE"],
-    ["Lime", "#00FF00"],
     ["lime", "#00FF00"],
     ["lime green", "#32CD32"],
-    ["Maroon", "#800000"],
     ["maroon", "#800000"],
     ["medium aqua marine", "#66CDAA"],
     ["medium blue", "#0000CD"],
@@ -271,20 +276,15 @@ colors = [
     ["sandy brown", "#F4A460"],
     ["sea green", "#2E8B57"],
     ["sienna", "#A0522D"],
-    ["sky blue", "#87CEEB"],
     ["slate blue", "#6A5ACD"],
     ["slate gray", "#708090"],
     ["spring green", "#00FF7F"],
     ["steel blue", "#4682B4"],
-    ["tan", "#D2B48C"],
     ["Teal", "#008080"],
     ["teal", "#008080"],
     ["thistle", "#D8BFD8"],
     ["tomato", "#FF6347"],
-    ["turquoise", "#40E0D0"],
     ["violet", "#EE82EE"],
-    ["yellow", "#FFFF00"],
-    ["yellow green", "#9ACD32"]
 ]
 
 
@@ -292,8 +292,8 @@ if __name__ == '__main__':
     start = time.time()
     cs = MajorMap(MajorMap.CS, asyncio.get_event_loop())
     c = Chart(cs)
-    print(c.get_map().get_terms_list())
-    # c.get_graph()
+    # print(c.get_map().get_terms_list())
+    c.get_graph()
     # cs.move_course('CSE 110', 'Term 1', 'Term 2')
     # print(cs.get_terms_list(False, True))
     # c.get_graph()

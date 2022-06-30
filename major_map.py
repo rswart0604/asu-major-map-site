@@ -249,6 +249,15 @@ class MajorMap:
                     break
         return
 
+    def remove_course_at_term(self, course, term):
+        term_index = list(self.terms_dict.keys()).index(term)
+        course_index = self.terms_dict[term].index(course)
+        self.hours_terms_dict[term].pop(course_index)
+        self.terms_dict[term].pop(course_index)
+        self.hours_term_list[term_index].pop(course_index)
+        self.terms_dict_urls[term].pop(course_index)
+        self.terms_list[term_index].pop(course_index)
+
     def get_sim_courses(self, maj_map: 'MajorMap'):
         list1 = self.terms_list
         list2 = maj_map.get_terms_list()
@@ -463,7 +472,6 @@ class MajorMap:
             my_terms_list.pop(term)
             temp.append(term)
         return temp[spot-1]
-
 
     def move_course(self, course, source, dest, abbreviation=True):
         if abbreviation:

@@ -41,7 +41,7 @@ def get_info():
             try:
                 current_map = mm.MajorMap(request.headers['data'], loop)
             except Exception as e:
-                invalid_url(e)
+                return invalid_url(e)
             current_chart = mc.Chart(current_map)
 
         else:  # we're just adding to a major map
@@ -50,7 +50,7 @@ def get_info():
                 current_chart = jsonpickle.decode(session['current_chart']).add_map(current_map)
 
             except Exception as e:
-                invalid_url(e)
+                return invalid_url(e)
         session['current_chart'] = jsonpickle.encode(current_chart)
         svg = current_chart.get_graph()
         svg = svg[:5] + 'id="major_map_svg" ' + svg[5:]
@@ -89,9 +89,33 @@ def move_it():
     try:
         int(course[-1])
         new_course = course[:len(course)-2]
+    except Exception:
+        new_course = course
+    current_chart.move_course(new_course, my_map.get_term(course), term)
+    session['current_chart'] = jsonpickle.encode(current_chart)
+    svg = current_chart.get_graph()
+    svg = svg[:5] + 'id="major_map_svg" ' + svg[5:]
+    return svg
+
+
+@app.route('/remove', methods=['GET', 'POST'])
+def remove():
+    if 'current_chart' not in session:
+        return ''
+    if 'course' in request.headers:
+        course = request.headers.get('course')
+    else:
+        return 'reset svg'
+    current_chart = jsonpickle.decode(session.get('current_chart'))
+    my_map = current_chart.get_map()
+    term = my_map.get_term(course)
+    try:
+        int(course[-1])
+        new_course = course[:len(course) - 2]
     except ValueError:
         new_course = course
-    my_map.move_course(new_course, my_map.get_term(course), term, abbreviation=False)
+    print(term)
+    my_map.remove_course_at_term(new_course, term)
     new_chart = mc.Chart(my_map)
     session['current_chart'] = jsonpickle.encode(new_chart)
     svg = new_chart.get_graph()

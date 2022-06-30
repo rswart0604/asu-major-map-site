@@ -11,7 +11,7 @@
     background-color: gold;
     border-style: none;
     margin-bottom: 2vh;
-    padding-top: 40px;
+    padding-top: 5px;
 }
 
 
@@ -57,7 +57,15 @@ html, body {
     #course_selection {width: 30%; height: 24px;}
     #to_label {font-size: 16px; font-family: Helvetica;}
     #term_selection {width: 30%; height: 24px;}
+    #move_term_submit {height: 25px}
+
+    #remove_form {position: relative; top: 10px}
+    #remove_label {font-size: 16px; font-family: Helvetica}
+    #remove_selection {width: 30%; height: 24px}
+    #remove_submit {height: 25px}
+
 
     #svg_container {width: 70vw; margin-left: 1vw;}
-    #major_map_svg {position: relative; width: 70vw; height: 50vw; top: 0; border-color: maroon; border-style: solid}
+    #major_map_svg {position: relative; width: 70vw; height: 50vw; top: 0; border-color: maroon; border-style: solid; border-width: 4px}
+
 }

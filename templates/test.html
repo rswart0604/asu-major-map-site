@@ -40,7 +40,7 @@
         function major_name() {
             const formData = document.getElementById("major_name_box").value;
             const xhttp = new XMLHttpRequest();
-            document.getElementById('svg_container').innerHTML = '';
+            document.getElementById('svg_container').innerHTML = '<p>Loading...</p>';
             xhttp.onload = function () {
                 if (this.responseText === "reset svg") {
                     resetSvgStuff();
@@ -58,6 +58,7 @@
                 console.log(document.getElementById('major_map_svg'));
                 foo();
                 add_courses_terms_to_dropdown();
+                downloadable();
             }, 200, 1000000);
         }
 
@@ -71,7 +72,10 @@
             xhttp.onload = function () {
                 var c_select = document.getElementById("course_selection");
                 c_select.innerHTML = '';
-                c_select.innerHTML = '<option value="" disabled selected>Course</option>';
+                c_select.innerHTML = '<option value="" disabled selected>Course name</option>';
+                var remove_c_select = document.getElementById("remove_selection");
+                remove_c_select.innerHTML = '';
+                remove_c_select.innerHTML = '<option value="" disabled selected>Course name</option>';
                 var t_select = document.getElementById("term_selection");
                 t_select.innerHTML = '';
                 t_select.innerHTML = '<option value="" disabled selected>Term</option>';
@@ -103,7 +107,11 @@
                     var opt = document.createElement('option');
                     opt.value = new_courses[i];
                     opt.innerHTML = new_courses[i]
+                    var opt2 = document.createElement('option');
+                    opt2.value = new_courses[i];
+                    opt2.innerHTML = new_courses[i]
                     c_select.append(opt);
+                    remove_c_select.append(opt2);
                 }
                 for (var x=0; x<terms.length; x++) {
                     var t_opt = document.createElement('option');
@@ -120,7 +128,7 @@
             const course = document.getElementById("course_selection").value;
             const term = document.getElementById("term_selection").value;
             const xhttp = new XMLHttpRequest();
-            document.getElementById('svg_container').innerHTML = '';
+            {#document.getElementById('svg_container').innerHTML = '';#}
             xhttp.onload = function () {
                 if (this.responseText === "reset svg") {
                     resetSvgStuff();
@@ -130,6 +138,7 @@
                         svg_data = this.responseText;
                     }
                     foo();
+                    downloadable()
                 }
             }
             xhttp.open('POST', '/move');
@@ -137,6 +146,49 @@
             xhttp.setRequestHeader('term', term);
             xhttp.send();
         }
+
+        function remove_course() {
+            const course = document.getElementById('remove_selection').value;
+            const xhttp = new XMLHttpRequest();
+            xhttp.onload = function () {
+                if (this.responseText === "reset svg") {
+                    resetSvgStuff();
+                } else {
+                    document.getElementById('svg_container').innerHTML = this.responseText;
+                    if (this.responseText.substring(0, 4) === "<svg") {
+                        svg_data = this.responseText;
+                    }
+                    foo();
+                    downloadable()
+                }
+            }
+            xhttp.open('POST', '/remove');
+            xhttp.setRequestHeader('course', course);
+            xhttp.send();
+        }
+
+        function downloadable() {
+            //get svg element.
+            var link = document.createElement("a");
+
+            var source = document.getElementById("svg_container").innerHTML;
+            source = "<div>" + source + "</div>";
+            var svgBlob = new Blob([source], {type:"image/svg+xml;charset=utf-8"});
+            var url = URL.createObjectURL(svgBlob);
+            link.href = url;
+            link.id = "link";
+            link.download = "major_map.svg";
+            link.style.fontSize = "16px";
+            link.style.fontFamily = "Helvetica";
+            link.style.position = "relative";
+            link.style.bottom = "5px";
+            link.innerHTML = "Click to download major map";
+            {#var newSource = document.getElementById("svg_container").innerHTML;#}
+            document.getElementById("svg_container").prepend(link);
+
+            console.log(url);
+        }
+
     </script>
 
     <div id="top_left_buttons">
@@ -152,16 +204,24 @@
         <form id="move_form" method="post">
             <label for="course_selection" id="move_label">Move </label>
             <select id="course_selection">
-                <option value="" disabled selected>Course</option>
-                <option value="foo">foo</option>
+                <option value="" disabled selected>Course name</option>
             </select>
             <label for="term_selection" id="to_label">to</label>
             <select id="term_selection">
                 <option value="" disabled selected>Term</option>
-                <option value="bar">bar</option>
             </select>
             <input type="reset" type="button" id="move_term_submit" onclick="move_course();" value="Submit">
         </form>
+
+        <form id="remove_form" method="post">
+            <label for="remove_selection" id="remove_label">Remove </label>
+            <select id="remove_selection">
+                <option value="" disabled selected>Course name</option>
+            </select>
+            <input type="reset" type="button" id="remove_submit" onclick="remove_course();" value="Submit">
+        </form>
+
+
     </div>
 
 
