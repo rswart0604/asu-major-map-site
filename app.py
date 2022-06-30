@@ -46,8 +46,8 @@ def get_info():
 
         else:  # we're just adding to a major map
             try:
-                temp_map = mm.MajorMap(request.headers['data'], loop)
-                current_chart = jsonpickle.decode(session['current_chart']).add_map(temp_map)
+                current_map = mm.MajorMap(request.headers['data'], loop)
+                current_chart = jsonpickle.decode(session['current_chart']).add_map(current_map)
 
             except Exception as e:
                 invalid_url(e)
@@ -57,20 +57,47 @@ def get_info():
         return svg
     return 'reset svg'
 
-    # a = random.random()
-    # resp = make_response(render_template('test.html'))
-    # resp.set_cookie('your cookie', value=str(a))
-    # return resp
+
+@app.route('/move_data', methods=['GET', 'POST'])
+def move_stuff():
+    if 'current_chart' not in session:
+        return ''
+    current_map = jsonpickle.decode(session['current_chart']).get_map()
+    courses_terms = current_map.get_terms_list(labels=True)
+    terms = list(courses_terms.keys())
+    print('terms' + str(terms))
+    temp_courses = list(courses_terms.values())
+    courses = []
+    for x in temp_courses:
+        for y in x:
+            courses.append(y)
+    out = '#####'.join(courses) + '-----' + '$$$$$'.join(terms)
+    return out
 
 
-    #
-    # svg = open('cs.svg').read()
-    # if request.headers['data'] == 'a':
-    #     svg = open('cse.svg').read()
-    #     # svg = ''
-    # print(svg)
-    # return svg
-    # return request.headers['data']
+@app.route("/move", methods=['GET', 'POST'])
+def move_it():
+    if 'current_chart' not in session:
+        return ''
+    if 'term' in request.headers and 'course' in request.headers:
+        course = request.headers.get('course')
+        term = request.headers.get('term')
+    else:
+        return 'reset svg'
+    current_chart = jsonpickle.decode(session.get('current_chart'))
+    my_map = current_chart.get_map()
+    try:
+        int(course[-1])
+        new_course = course[:len(course)-2]
+    except ValueError:
+        new_course = course
+    my_map.move_course(new_course, my_map.get_term(course), term, abbreviation=False)
+    new_chart = mc.Chart(my_map)
+    session['current_chart'] = jsonpickle.encode(new_chart)
+    svg = new_chart.get_graph()
+    svg = svg[:5] + 'id="major_map_svg" ' + svg[5:]
+    return svg
+
 
 
 if __name__ == '__main__':

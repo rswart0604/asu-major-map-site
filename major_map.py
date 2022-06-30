@@ -325,7 +325,7 @@ class MajorMap:
         # turn that list into where it actually has the official naming
         # output that official naming list
 
-        print(course_name)
+        # print(course_name)
         try:
             r = self.prereqs[course_name]
             print('nailed it')
@@ -339,7 +339,7 @@ class MajorMap:
 
         # get some more soup!
         new_url = url.replace('courselist', 'mycourselistresults')
-        print(new_url)
+        # print(new_url)
         for x in range(3):
             try:
                 foo = urlopen(new_url)
@@ -367,7 +367,7 @@ class MajorMap:
             elif abb[0:3] in text and abb[4:7] in text:  # going a lil complicated but cmon just work already
                 out.append(self.abbreviation_to_course_name[abb])
         self.prereqs[course_name] = out
-        print(course_name + ":   " + str(self.prereqs[course_name]))
+        # print(course_name + ":   " + str(self.prereqs[course_name]))
         return out
 
     async def get_async_prereq(self, course_name):
@@ -406,7 +406,6 @@ class MajorMap:
             if len(tables) > 1:
                 return []
             else:
-                print('tables' + str(tables))
                 try:
                     text = tables[0].text
                 except Exception:
@@ -448,6 +447,24 @@ class MajorMap:
                 continue
         return out
 
+    # uber specific for a dropdown menu yea i know
+    def get_term(self, course):
+        try:
+            spot = int(course[-1])
+        except ValueError:
+            return get_key_from_nested(self.get_terms_list(labels=True), course)
+        real_course = course[:len(course)-2]
+        my_terms_list = self.get_terms_list(labels=True)
+        flat_list = flatten(self.get_terms_list())
+        count = flat_list.count(real_course)
+        temp = []
+        for x in range(count):
+            term = get_key_from_nested(my_terms_list, real_course)
+            my_terms_list.pop(term)
+            temp.append(term)
+        return temp[spot-1]
+
+
     def move_course(self, course, source, dest, abbreviation=True):
         if abbreviation:
             course = self.abbreviation_to_course_name[course]
@@ -482,9 +499,9 @@ class MajorMap:
 if __name__ == '__main__':
     # cs = MajorMap(MajorMap.CS)
     cse = MajorMap(MajorMap.CSE)
-    cse.remove_courses('CSE 230: Computer Organization and Assembly Language Programming')
-    print(cse.hours_term_list[3])
-    print(cse.terms_dict.get('Term 4'))
+    # cse.remove_courses('CSE 230: Computer Organization and Assembly Language Programming')
+    # print(cse.hours_term_list[3])
+    # print(cse.terms_dict.get('Term 4'))
     # cs_cse = cs + cse
     # pprint(cs.get_terms_list())
     # pprint(cs_cse.get_terms_list())

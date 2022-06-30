@@ -57,6 +57,7 @@
             waitForElementToDisplay("major_map_svg", function() {
                 console.log(document.getElementById('major_map_svg'));
                 foo();
+                add_courses_terms_to_dropdown();
             }, 200, 1000000);
         }
 
@@ -65,21 +66,105 @@
             foo();
         }
 
-        function deleteCookies() {
-            console.log('delete!');
+        function add_courses_terms_to_dropdown() {
+            const xhttp = new XMLHttpRequest();
+            xhttp.onload = function () {
+                var c_select = document.getElementById("course_selection");
+                c_select.innerHTML = '';
+                c_select.innerHTML = '<option value="" disabled selected>Course</option>';
+                var t_select = document.getElementById("term_selection");
+                t_select.innerHTML = '';
+                t_select.innerHTML = '<option value="" disabled selected>Term</option>';
+                var courses_terms = this.responseText.split("-----");
+                var courses = courses_terms[0].split("#####");
+                var new_courses = [];
+                var temp_courses = [];
+                for (var j=0; j<courses.length; j++) {
+                    if (temp_courses.includes(courses[j])) {
+                        var count = temp_courses.filter(x => x == courses[j]).length;
+                        count++;
+                        new_courses.push((courses[j] + " " + count.toString()));
+                        temp_courses.push(courses[j]);
+                    } else {
+                        if (courses.filter(x => x == courses[j]).length > 1) {
+                            new_courses.push((courses[j] + " 1"));
+                            temp_courses.push(courses[j]);
+                        } else {
+                            new_courses.push(courses[j]);
+                            temp_courses.push(courses[j]);
+                        }
+                    }
+                }
+                var terms = courses_terms[1].split('$$$$$');
+                for (var i=0; i<new_courses.length; i++) {
+                    if (new_courses[0].length < 1) {
+                        return;
+                    }
+                    var opt = document.createElement('option');
+                    opt.value = new_courses[i];
+                    opt.innerHTML = new_courses[i]
+                    c_select.append(opt);
+                }
+                for (var x=0; x<terms.length; x++) {
+                    var t_opt = document.createElement('option');
+                    t_opt.value = terms[x];
+                    t_opt.innerHTML = terms[x];
+                    t_select.append(t_opt);
+                }
+            }
+            xhttp.open('POST', '/move_data');
+            xhttp.send();
+        }
+
+        function move_course() {
+            const course = document.getElementById("course_selection").value;
+            const term = document.getElementById("term_selection").value;
+            const xhttp = new XMLHttpRequest();
+            document.getElementById('svg_container').innerHTML = '';
+            xhttp.onload = function () {
+                if (this.responseText === "reset svg") {
+                    resetSvgStuff();
+                } else {
+                    document.getElementById('svg_container').innerHTML = this.responseText;
+                    if (this.responseText.substring(0, 4) === "<svg") {
+                        svg_data = this.responseText;
+                    }
+                    foo();
+                }
+            }
+            xhttp.open('POST', '/move');
+            xhttp.setRequestHeader('course', course);
+            xhttp.setRequestHeader('term', term);
+            xhttp.send();
         }
     </script>
 
-    <div id="top_buttons">
+    <div id="top_left_buttons">
         <form id='major_name_form' method="post">
             <label for="major_name_box"></label>
             <input type="text" id="major_name_box" name="major_name_box"
                    placeholder="Link to (or precise name of) major map" required>
             <input type="reset" id="major_name_box_submit" onclick="major_name();" value="Add">
         </form>
+        <button id="reset_button" type="button" onclick="resetSvgStuff()">Reset</button>
+    </div>
+    <div id="top_right_buttons">
+        <form id="move_form" method="post">
+            <label for="course_selection" id="move_label">Move </label>
+            <select id="course_selection">
+                <option value="" disabled selected>Course</option>
+                <option value="foo">foo</option>
+            </select>
+            <label for="term_selection" id="to_label">to</label>
+            <select id="term_selection">
+                <option value="" disabled selected>Term</option>
+                <option value="bar">bar</option>
+            </select>
+            <input type="reset" type="button" id="move_term_submit" onclick="move_course();" value="Submit">
+        </form>
     </div>
 
-    <button id="reset_button" type="button" onclick="resetSvgStuff()">Reset</button>
+
 </div>
 
 <div id="svg_container">

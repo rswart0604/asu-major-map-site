@@ -43,11 +43,21 @@ html, body {
 @media only screen and (min-width: 600px) {
 
     #site_header {font-size: 3vmax; padding-top: 0px}
-    #top_menu {text-align: left; margin-left: 1vw}
-    #major_name_box {width: 40%; height: 20px}
+
+    #top_menu {text-align: left; margin-left: 1vw; margin-right: 1vw; height: 10vh}
+    #top_left_buttons {position: absolute; display: inline-block; width: 50%}
+    #top_right_buttons {position: absolute; display: inline-block; left: 50%; width: 50%}
+
+    #major_name_box {width: 80%; height: 20px}
     #major_name_box_submit {height: 25px}
-    #svg_container {width: 70vw; margin-left: 1vw; margin-top: 2vh;}
-    #major_map_svg {width: 70vw; height: 50vw; top: 0; border-color: maroon; border-style: solid}
-    #reset_button {height: 25px}
-/*    position: relative; top: 0; left: 0*/
+    #reset_button {position: relative; top: 10px; height: 25px; width: 100px}
+
+    #move_form {position: relative;}
+    #move_label {font-size: 16px; font-family: Helvetica;}
+    #course_selection {width: 30%; height: 24px;}
+    #to_label {font-size: 16px; font-family: Helvetica;}
+    #term_selection {width: 30%; height: 24px;}
+
+    #svg_container {width: 70vw; margin-left: 1vw;}
+    #major_map_svg {position: relative; width: 70vw; height: 50vw; top: 0; border-color: maroon; border-style: solid}
 }

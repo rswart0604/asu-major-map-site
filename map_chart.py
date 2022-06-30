@@ -1,3 +1,4 @@
+import asyncio
 import copy
 import random
 import time
@@ -52,6 +53,9 @@ class Chart:
     def add_map(self, some_map):
         self.maj_map = self.maj_map + some_map
         self.map = self.maj_map.get_terms_list(False, True, return_copy=False)
+
+    def get_map(self):
+        return self.maj_map
 
     def get_graph(self):
         with schemdraw.Drawing(show=False, fontsize=12) as d:
@@ -286,10 +290,11 @@ colors = [
 
 if __name__ == '__main__':
     start = time.time()
-    cs = MajorMap(MajorMap.CS)
+    cs = MajorMap(MajorMap.CS, asyncio.get_event_loop())
     c = Chart(cs)
-    c.get_graph()
-    cs.move_course('CSE 110', 'Term 1', 'Term 2')
+    print(c.get_map().get_terms_list())
+    # c.get_graph()
+    # cs.move_course('CSE 110', 'Term 1', 'Term 2')
     # print(cs.get_terms_list(False, True))
-    c.get_graph()
-    print(time.time() - start)
+    # c.get_graph()
+    # print(time.time() - start)
