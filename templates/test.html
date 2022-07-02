@@ -49,6 +49,9 @@
                     if (this.responseText.substring(0, 4) === "<svg") {
                         svg_data = this.responseText;
                     }
+                    if (svg_data.length > 0) {
+                        document.getElementById('svg_container').innerHTML = this.responseText + '<br>' + svg_data
+                    }
                 }
             };
             xhttp.open("POST", "/test");
@@ -199,7 +202,7 @@
         <form id='major_name_form' method="post">
             <label for="major_name_box"></label>
             <input type="text" id="major_name_box" name="major_name_box"
-                   placeholder="Link to (or precise name of) major map" required>
+                   placeholder="Name of major or link to its major map website" required>
             <input type="reset" id="major_name_box_submit" onclick="major_name();" value="Add">
         </form>
         <button id="reset_button" type="button" onclick="resetSvgStuff()">Reset</button>
@@ -233,6 +236,15 @@
 
 <div id="svg_container">
 </div>
+
+<script>
+    var form = document.getElementById('major_name_form');
+    form.addEventListener('submit', function (event) {
+        document.getElementById('major_name_box_submit').click();
+        event.preventDefault();
+    })
+
+</script>
 
 
 </body>

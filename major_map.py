@@ -51,7 +51,9 @@ class MajorMap:
                 major_map_url = 'asu ' + major_map_url
             if 'major map' not in major_map_url:
                 major_map_url = 'major map ' + major_map_url
-            major_map_url = [x for x in googlesearch.search('asu major map' + major_map_url)][0]
+            redirect_url = [x for x in googlesearch.search(major_map_url)][0]
+            major_map_url = 'https://degrees.apps.asu.edu/major-map' + redirect_url.split('roadmaps', 1)[1]
+            print(major_map_url)
 
         # get our soup
         if loop is not None:
@@ -124,6 +126,8 @@ class MajorMap:
                         continue
 
                     course = str(course_text).strip().replace("  ", " ").replace("\n", "").replace("\r", "")
+                    if len(course) > 240:
+                        continue
                     if course_tr.div.a is not None:
                         url = course_tr.div.a['href']
                     else:
@@ -512,7 +516,7 @@ class MajorMap:
 
 
 if __name__ == '__main__':
-    cs = MajorMap(MajorMap.CS)
+    cs = MajorMap('computer science', asyncio.get_event_loop())
     # cse = MajorMap(MajorMap.CSE, asyncio.get_event_loop())
     # cse.remove_courses('CSE 230: Computer Organization and Assembly Language Programming')
     # print(cse.hours_term_list[3])
