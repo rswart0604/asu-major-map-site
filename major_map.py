@@ -5,7 +5,7 @@ from urllib.request import urlopen, ProxyHandler
 from proxy_finder import get_proxy
 import aiohttp
 import asyncio
-from pprint import pprint
+import googlesearch
 
 
 def flatten(nested_list) -> list:
@@ -45,6 +45,13 @@ class MajorMap:
 
         :param major_map_url: the url of the major map
         """
+
+        if 'http' not in major_map_url and 'www' not in major_map_url:
+            if 'asu' not in major_map_url:
+                major_map_url = 'asu ' + major_map_url
+            if 'major map' not in major_map_url:
+                major_map_url = 'major map ' + major_map_url
+            major_map_url = [x for x in googlesearch.search('asu major map' + major_map_url)][0]
 
         # get our soup
         if loop is not None:
@@ -505,8 +512,8 @@ class MajorMap:
 
 
 if __name__ == '__main__':
-    # cs = MajorMap(MajorMap.CS)
-    cse = MajorMap(MajorMap.CSE, asyncio.get_event_loop())
+    cs = MajorMap(MajorMap.CS)
+    # cse = MajorMap(MajorMap.CSE, asyncio.get_event_loop())
     # cse.remove_courses('CSE 230: Computer Organization and Assembly Language Programming')
     # print(cse.hours_term_list[3])
     # print(cse.terms_dict.get('Term 4'))

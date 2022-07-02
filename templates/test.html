@@ -129,7 +129,7 @@
             const course = document.getElementById("course_selection").value;
             const term = document.getElementById("term_selection").value;
             const xhttp = new XMLHttpRequest();
-            {#document.getElementById('svg_container').innerHTML = '';#}
+            document.getElementById('svg_container').innerHTML = 'Loading...';
             xhttp.onload = function () {
                 if (this.responseText === "reset svg") {
                     resetSvgStuff();
@@ -139,7 +139,8 @@
                         svg_data = this.responseText;
                     }
                     foo();
-                    downloadable()
+                    downloadable();
+                    add_courses_terms_to_dropdown();
                 }
             }
             xhttp.open('POST', '/move');
@@ -151,6 +152,7 @@
         function remove_course() {
             const course = document.getElementById('remove_selection').value;
             const xhttp = new XMLHttpRequest();
+            document.getElementById('svg_container').innerHTML = "Loading...";
             xhttp.onload = function () {
                 if (this.responseText === "reset svg") {
                     resetSvgStuff();
@@ -160,7 +162,8 @@
                         svg_data = this.responseText;
                     }
                     foo();
-                    downloadable()
+                    downloadable();
+                    add_courses_terms_to_dropdown();
                 }
             }
             xhttp.open('POST', '/remove');
