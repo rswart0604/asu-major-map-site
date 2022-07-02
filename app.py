@@ -30,7 +30,7 @@ def hello_world():  # put application's code here
 
 def invalid_url(err):
     print('ERR')
-    print(err)
+    print('err is' + str(err))
     return 'must be valid url!'  # todo make this like a template or something idk
 
 
