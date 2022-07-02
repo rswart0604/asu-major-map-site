@@ -506,7 +506,7 @@ class MajorMap:
 
 if __name__ == '__main__':
     # cs = MajorMap(MajorMap.CS)
-    cse = MajorMap(MajorMap.CSE)
+    cse = MajorMap(MajorMap.CSE, asyncio.get_event_loop())
     # cse.remove_courses('CSE 230: Computer Organization and Assembly Language Programming')
     # print(cse.hours_term_list[3])
     # print(cse.terms_dict.get('Term 4'))
