@@ -60,6 +60,9 @@ class Chart:
     def move_course(self, course, source, dest):
         self.maj_map.move_course(course, source, dest, abbreviation=False)
 
+    def remove_course(self, course, term):
+        self.maj_map.remove_course_at_term(course, term)
+
     def get_graph(self):
         with schemdraw.Drawing(show=False, fontsize=12) as d:
 

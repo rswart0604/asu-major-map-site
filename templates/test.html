@@ -7,7 +7,7 @@
     <title>Major Map</title>
 </head>
 
-<body onunload="deleteCookies()">
+<body ">
 
 <div>
     <header id="site_header">
@@ -18,13 +18,17 @@
 
     <script src="../static/svg_stuff.js"></script>
     <script>
-
-        function deleteCookies() {
+        window.addEventListener("beforeunload", function(event) {
+            event.preventDefault();
             {#document.cookie = "session=null";#}
-            var xhttp = new XMLHttpRequest();
-            xhttp.open('POST', '/delete_cookie');
+            const xhttp = new XMLHttpRequest();
+            xhttp.onload = function () {
+                console.log('hi!');
+            }
+            xhttp.open('GET', '/delete_cookie');
+
             xhttp.send();
-        }
+        });
 
         var svg_data = "";
 

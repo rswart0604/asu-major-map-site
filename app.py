@@ -4,6 +4,9 @@ import shutil
 import threading
 import asyncio
 import traceback
+import uuid
+
+import flask
 import jsonpickle
 
 import major_map as mm
@@ -13,19 +16,16 @@ from flask import Flask, render_template, request, make_response, session
 
 app = Flask(__name__)
 app.secret_key = 'this is a really quite super secret key, if i do say so myself'
+# app.config["SESSION_TYPE"] = "filesystem"
 
 counter = 0
 loop = asyncio.get_event_loop()
 
+chart_dict = {}
+
 
 @app.route('/', methods=['GET', 'POST'])
 def hello_world():  # put application's code here
-    # print(threading.enumerate())
-    # if request.method == 'POST':
-    #     print(request.values)
-    #     print('wassup')
-    #     # print(request.values[0][1][1])
-    #     return render_template('test.html', foo='boo')
     return render_template('test.html')
 
 
@@ -37,39 +37,40 @@ def invalid_url(err):
 
 @app.route('/test', methods=['GET', 'POST'])
 def get_info():
+    print(request.cookies)
     if request.headers['data'].strip() != '':
-        print(session)
-        # print(session['current_chart'])
-        if 'current_chart' not in session or session['current_chart'] == 'null':  # we have no major map yet
+        if 'key' not in request.cookies or request.cookies.get('key') not in chart_dict:  # we have no major map yet
             try:
                 current_map = mm.MajorMap(request.headers['data'], loop)
             except Exception as e:
                 return invalid_url(e)
             current_chart = mc.Chart(current_map)
             print('first map')
-
+            new_key = str(uuid.uuid1())
         else:  # we're just adding to a major map
             try:
                 print('hiya')
                 current_map = mm.MajorMap(request.headers['data'], loop)
-                current_chart = jsonpickle.decode(session['current_chart'])
+                new_key = request.cookies.get('key')
+                current_chart = chart_dict.get(new_key)
                 current_chart.add_map(current_map)
             except Exception as e:
                 return invalid_url(e)
         print('the pickle is' + str(jsonpickle.encode(current_chart)))
-        session['current_chart'] = jsonpickle.encode(current_chart)
-        print(session['current_chart'])
         svg = current_chart.get_graph()
         svg = svg[:5] + 'id="major_map_svg" ' + svg[5:]
-        return svg
+        res = make_response(svg)
+        res.set_cookie('key', new_key)
+        chart_dict[new_key] = current_chart
+        return res
     return 'reset svg'
 
 
 @app.route('/move_data', methods=['GET', 'POST'])
 def move_stuff():
-    if 'current_chart' not in session:
+    if 'key' not in request.cookies:
         return ''
-    current_map = jsonpickle.decode(session['current_chart']).get_map()
+    current_map = chart_dict.get(request.cookies.get('key')).get_map()
     print('current map ' + str(current_map))
     courses_terms = current_map.get_terms_list(labels=True)
     print(courses_terms)
@@ -86,14 +87,14 @@ def move_stuff():
 
 @app.route("/move", methods=['GET', 'POST'])
 def move_it():
-    if 'current_chart' not in session:
+    if 'key' not in request.cookies:
         return ''
     if 'term' in request.headers and 'course' in request.headers:
         course = request.headers.get('course')
         term = request.headers.get('term')
     else:
         return 'reset svg'
-    current_chart = jsonpickle.decode(session.get('current_chart'))
+    current_chart = chart_dict.get(request.cookies.get('key'))
     my_map = current_chart.get_map()
     try:
         int(course[-1])
@@ -101,7 +102,6 @@ def move_it():
     except Exception:
         new_course = course
     current_chart.move_course(new_course, my_map.get_term(course), term)
-    session['current_chart'] = jsonpickle.encode(current_chart)
     svg = current_chart.get_graph()
     svg = svg[:5] + 'id="major_map_svg" ' + svg[5:]
     return svg
@@ -109,13 +109,13 @@ def move_it():
 
 @app.route('/remove', methods=['GET', 'POST'])
 def remove():
-    if 'current_chart' not in session:
+    if 'key' not in request.cookies:
         return ''
     if 'course' in request.headers:
         course = request.headers.get('course')
     else:
         return 'reset svg'
-    current_chart = jsonpickle.decode(session.get('current_chart'))
+    current_chart = chart_dict.get(request.cookies.get('key'))
     my_map = current_chart.get_map()
     term = my_map.get_term(course)
     try:
@@ -124,21 +124,22 @@ def remove():
     except ValueError:
         new_course = course
     print(term)
-    my_map.remove_course_at_term(new_course, term)
-    new_chart = mc.Chart(my_map)
-    session['current_chart'] = jsonpickle.encode(new_chart)
-    svg = new_chart.get_graph()
+    current_chart.remove_course(new_course, term)
+
+    svg = current_chart.get_graph()
     svg = svg[:5] + 'id="major_map_svg" ' + svg[5:]
-    return svg
+    res = flask.make_response(svg)
+    return res
 
 
 @app.route('/delete_cookie', methods=['GET', 'POST'])
 def del_cookie():
-    print(session)
-    session['current_chart'] = 'null'
-    session.modified = True
-    print(session)
-    return ''
+    print('outta here')
+    the_key = request.cookies.get('key')
+    chart_dict.pop(the_key)
+    res = make_response('')
+    res.set_cookie('key', 'null')
+    return res
 
 
 if __name__ == '__main__':
