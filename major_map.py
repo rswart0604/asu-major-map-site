@@ -151,6 +151,7 @@ class MajorMap:
         return self.get_name()
 
     def __add__(self, other):
+        print("IM BEING ADDED!!!!!!")
         if len(self.get_terms_list()) != len(other.get_terms_list()):
             raise ValueError('Number of terms are different')
         self.name = self.get_name() + ' AND ' + other.get_name()
@@ -517,6 +518,10 @@ class MajorMap:
 
 if __name__ == '__main__':
     cs = MajorMap('computer science', asyncio.get_event_loop())
+    a = MajorMap('aerospace', asyncio.get_event_loop())
+    new = cs + a
+    print(new)
+    print(new.get_terms_list(labels=True))
     # cse = MajorMap(MajorMap.CSE, asyncio.get_event_loop())
     # cse.remove_courses('CSE 230: Computer Organization and Assembly Language Programming')
     # print(cse.hours_term_list[3])

@@ -20,11 +20,12 @@ loop = asyncio.get_event_loop()
 
 @app.route('/', methods=['GET', 'POST'])
 def hello_world():  # put application's code here
-    print(threading.enumerate())
-    if request.method == 'POST':
-        print(request.values)
-        # print(request.values[0][1][1])
-        return render_template('test.html', foo='boo')
+    # print(threading.enumerate())
+    # if request.method == 'POST':
+    #     print(request.values)
+    #     print('wassup')
+    #     # print(request.values[0][1][1])
+    #     return render_template('test.html', foo='boo')
     return render_template('test.html')
 
 
@@ -37,21 +38,27 @@ def invalid_url(err):
 @app.route('/test', methods=['GET', 'POST'])
 def get_info():
     if request.headers['data'].strip() != '':
-        if 'current_map' not in session:  # we have no major map yet
+        print(session)
+        # print(session['current_chart'])
+        if 'current_chart' not in session or session['current_chart'] == 'null':  # we have no major map yet
             try:
                 current_map = mm.MajorMap(request.headers['data'], loop)
             except Exception as e:
                 return invalid_url(e)
             current_chart = mc.Chart(current_map)
+            print('first map')
 
         else:  # we're just adding to a major map
             try:
+                print('hiya')
                 current_map = mm.MajorMap(request.headers['data'], loop)
-                current_chart = jsonpickle.decode(session['current_chart']).add_map(current_map)
-
+                current_chart = jsonpickle.decode(session['current_chart'])
+                current_chart.add_map(current_map)
             except Exception as e:
                 return invalid_url(e)
+        print('the pickle is' + str(jsonpickle.encode(current_chart)))
         session['current_chart'] = jsonpickle.encode(current_chart)
+        print(session['current_chart'])
         svg = current_chart.get_graph()
         svg = svg[:5] + 'id="major_map_svg" ' + svg[5:]
         return svg
@@ -63,7 +70,9 @@ def move_stuff():
     if 'current_chart' not in session:
         return ''
     current_map = jsonpickle.decode(session['current_chart']).get_map()
+    print('current map ' + str(current_map))
     courses_terms = current_map.get_terms_list(labels=True)
+    print(courses_terms)
     terms = list(courses_terms.keys())
     print('terms' + str(terms))
     temp_courses = list(courses_terms.values())
@@ -88,7 +97,7 @@ def move_it():
     my_map = current_chart.get_map()
     try:
         int(course[-1])
-        new_course = course[:len(course)-2]
+        new_course = course[:len(course) - 2]
     except Exception:
         new_course = course
     current_chart.move_course(new_course, my_map.get_term(course), term)
@@ -122,6 +131,14 @@ def remove():
     svg = svg[:5] + 'id="major_map_svg" ' + svg[5:]
     return svg
 
+
+@app.route('/delete_cookie', methods=['GET', 'POST'])
+def del_cookie():
+    print(session)
+    session['current_chart'] = 'null'
+    session.modified = True
+    print(session)
+    return ''
 
 
 if __name__ == '__main__':

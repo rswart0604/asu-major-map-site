@@ -292,6 +292,7 @@ if __name__ == '__main__':
     start = time.time()
     cs = MajorMap(MajorMap.CS, asyncio.get_event_loop())
     c = Chart(cs)
+    c.add_map(MajorMap(MajorMap.CSE, asyncio.get_event_loop()))
     # print(c.get_map().get_terms_list())
     c.get_graph()
     # cs.move_course('CSE 110', 'Term 1', 'Term 2')

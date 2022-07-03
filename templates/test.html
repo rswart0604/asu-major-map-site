@@ -7,7 +7,7 @@
     <title>Major Map</title>
 </head>
 
-<body>
+<body onunload="deleteCookies()">
 
 <div>
     <header id="site_header">
@@ -18,6 +18,14 @@
 
     <script src="../static/svg_stuff.js"></script>
     <script>
+
+        function deleteCookies() {
+            {#document.cookie = "session=null";#}
+            var xhttp = new XMLHttpRequest();
+            xhttp.open('POST', '/delete_cookie');
+            xhttp.send();
+        }
+
         var svg_data = "";
 
         function waitForElementToDisplay(selector, callback, checkFrequencyInMs, timeoutInMs) {
@@ -49,10 +57,10 @@
                     if (this.responseText.substring(0, 4) === "<svg") {
                         svg_data = this.responseText;
                     }
-                    if (svg_data.length > 0) {
-                        document.getElementById('svg_container').innerHTML = this.responseText + '<br>' + svg_data
-                    }
+                    {#if (svg_data.length > 0) {#}
+                    {#    document.getElementById('svg_container').innerHTML = this.responseText + '<br>' + svg_data}#}
                 }
+                add_courses_terms_to_dropdown();
             };
             xhttp.open("POST", "/test");
             xhttp.setRequestHeader('data', formData);
@@ -60,18 +68,19 @@
             waitForElementToDisplay("major_map_svg", function() {
                 console.log(document.getElementById('major_map_svg'));
                 foo();
-                add_courses_terms_to_dropdown();
                 downloadable();
             }, 200, 1000000);
         }
 
         function resetSvgStuff() {
             document.getElementById('svg_container').innerHTML = svg_data;
+            console.log('cookie!' + document.cookie);
             foo();
             downloadable();
         }
 
         function add_courses_terms_to_dropdown() {
+            console.log('dropdown!');
             const xhttp = new XMLHttpRequest();
             xhttp.onload = function () {
                 var c_select = document.getElementById("course_selection");
